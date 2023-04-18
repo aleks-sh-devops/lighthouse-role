@@ -1,0 +1,52 @@
+---
+- name: install epel-release
+  become: true
+  ansible.builtin.yum:
+    name: epel-release
+    state: present
+  tags:
+    - lighthouse
+
+- name: install nginx
+  become: true
+  ansible.builtin.yum:
+    name: nginx
+    state: present
+  notify: start nginx service
+  tags:
+    - lighthouse
+
+- name: Disable SELinux
+  become: true
+  ansible.posix.selinux:
+    state: disabled
+  tags:
+    - lighthouse
+  notify: setenforce
+
+
+- name: Create a directory if it does not exist
+  become: true
+  ansible.builtin.file:
+    path: "{{ lighthouse_location_dir }}"
+    state: directory
+    mode: '0755'
+  tags:
+    - lighthouse
+
+- name: install git
+  become: true
+  ansible.builtin.yum:
+    name: git
+    state: present
+  tags:
+    - lighthouse
+
+- name: copy lighthouse service from git
+  become: true
+  ansible.builtin.git:
+    repo: "{{ lighthouse_repo }}"
+    version: master
+    dest: /tmp/lighthouse
+  tags:
+    - lighthouse
