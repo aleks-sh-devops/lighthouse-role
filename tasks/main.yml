@@ -50,3 +50,47 @@
     dest: /tmp/lighthouse
   tags:
     - lighthouse
+
+
+
+- name: copy lighthouse files1 to nginx workdir
+  become: true
+  ansible.builtin.copy:
+    src: "/tmp/lighthouse/{{ item }}"
+    dest: "{{ lighthouse_location_dir }}"
+    mode: '0644'
+    remote_src: true
+    follow: true
+  loop:
+    - js
+    - app.js
+    - index.html
+    - jquery.js
+  notify: restart nginx service
+  tags:
+    - lighthouse
+
+- name: copy lighthouse files2 to nginx workdir
+  become: true
+  ansible.builtin.copy:
+    src: "/tmp/lighthouse/{{ item }}"
+    dest: "{{ lighthouse_location_dir }}"
+    mode: '0751'
+    remote_src: true
+    follow: true
+  loop:
+    - css
+    - img
+  notify: restart nginx service
+  tags:
+    - lighthouse
+
+- name: create lighthouse config
+  become: true
+  ansible.builtin.template:
+    src: templates/lighthouse.conf.j2
+    dest: /etc/nginx/conf.d/lighthouse.conf
+    mode: '0644'
+  notify: restart nginx service
+  tags:
+    - lighthouse
