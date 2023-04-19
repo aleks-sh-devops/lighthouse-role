@@ -1,4 +1,4 @@
-lighthouse
+lighthouse v 1.0.0
 =========
 
 This role can install vector on EL
